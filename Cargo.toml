@@ -1,0 +1,5 @@
+[workspace]
+members = ["myemma_logger", "myemma_panic_hook", "myemma_backtrace"]
+
+[profile.release]
+overflow-checks = true

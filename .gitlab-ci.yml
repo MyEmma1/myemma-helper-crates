@@ -1,0 +1,79 @@
+
+stages:
+  - code_check
+  - audit
+  - tests
+
+cache:
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+  paths:
+      # Don't include `incremental` to save space
+      # Debug
+      - target/debug/build/
+      - target/debug/deps/
+      - target/debug/.fingerprint/
+      - target/debug/.cargo-lock
+
+linux_build:
+  stage: code_check
+  when: manual
+  except:
+    - schedules
+  image: rust/rust:latest
+  needs: []
+  script:
+    - cargo build
+
+format:
+  stage: code_check
+  except:
+    - schedules
+  image: rust/rust:latest
+  needs: []
+  cache: {} # Disable caching for this job
+  script:
+    - cargo fmt -- --check
+  allow_failure: true
+
+lint:
+  stage: code_check
+  except:
+    - schedules
+  image: rust/rust:latest
+  needs: []
+  script:
+    # add clippy check
+    # - cargo clippy
+    # Don't allow warnings
+    - cargo clippy -- -D warnings
+    # Maybe add later `--all-targets --all-features`
+  allow_failure: true
+
+audit:
+  stage: audit
+  image: rust/rust:latest
+  needs: []
+  cache: {} # Disable caching for this job
+  before_script:
+    - cargo generate-lockfile
+  script:
+    - cargo audit
+  allow_failure: true # Because of current chrono bug
+
+# check_deny:
+#   stage: audit
+#   image: rust/rust:latest
+#   needs: []
+#   before_script:
+#     - cargo generate-lockfile
+#   script:
+#     - cargo deny check
+
+linux_test:
+  stage: tests
+  except:
+    - schedules
+  image: rust/rust:latest
+  needs: []
+  script:
+    - cargo test
