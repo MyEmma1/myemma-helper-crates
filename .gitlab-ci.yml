@@ -19,7 +19,7 @@ linux_build:
   when: manual
   except:
     - schedules
-  image: rust/rust:latest
+  image: rust:latest
   needs: []
   script:
     - cargo build
@@ -28,7 +28,7 @@ format:
   stage: code_check
   except:
     - schedules
-  image: rust/rust:latest
+  image: rust:latest
   needs: []
   cache: {} # Disable caching for this job
   script:
@@ -39,7 +39,7 @@ lint:
   stage: code_check
   except:
     - schedules
-  image: rust/rust:latest
+  image: rust:latest
   needs: []
   script:
     # add clippy check
@@ -51,7 +51,7 @@ lint:
 
 audit:
   stage: audit
-  image: rust/rust:latest
+  image: rust:latest
   needs: []
   cache: {} # Disable caching for this job
   before_script:
@@ -62,7 +62,7 @@ audit:
 
 # check_deny:
 #   stage: audit
-#   image: rust/rust:latest
+#   image: rust:latest
 #   needs: []
 #   before_script:
 #     - cargo generate-lockfile
@@ -73,7 +73,7 @@ linux_test:
   stage: tests
   except:
     - schedules
-  image: rust/rust:latest
+  image: rust:latest
   needs: []
   script:
     - cargo test
