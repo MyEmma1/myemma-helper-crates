@@ -1,5 +1,12 @@
 [workspace]
-members = ["myemma_logger", "myemma_panic_hook", "myemma_backtrace"]
+members = [
+    "myemma_logger",
+    "myemma_panic_hook",
+    "myemma_backtrace",
+    "myemma_rocket_launch_errors",
+    "myemma_rocket_options_fairing",
+    "myemma_api_error",
+]
 
 [profile.release]
 overflow-checks = true
