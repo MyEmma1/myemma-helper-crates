@@ -2,6 +2,7 @@
 name = "myemma_api_error"
 version = "0.1.0"
 authors = ["Ralph Bisschops <ralph.bisschops.dev@gmail.com>"]
+license = "MIT OR Apache-2.0"
 homepage = "https://myemma.io/"
 edition = "2021"
 publish = false
