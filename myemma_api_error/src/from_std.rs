@@ -80,6 +80,22 @@ where
     }
 }
 
+impl<C> From<std::string::FromUtf8Error> for ApiError<C>
+where
+    C: Default + Debug + Clone + PartialEq,
+    u16: From<C>,
+{
+    fn from(err: std::string::FromUtf8Error) -> Self {
+        let int_err = Self::new(
+            format!("FromUtf8Error Error: {}", err),
+            ApiErrorKind::BadRequest,
+            C::default(),
+        );
+        log::error!("FromUtf8Error error: {}. {}", err, int_err.log_link());
+        int_err
+    }
+}
+
 impl<C> From<Box<dyn std::any::Any + Send>> for ApiError<C>
 where
     C: Default + Debug + Clone + PartialEq,
