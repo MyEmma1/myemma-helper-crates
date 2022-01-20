@@ -6,6 +6,8 @@ use google_cloud_logging::*;
 use log::{Level, Metadata, Record};
 use myemma_backtrace::BacktraceFilter;
 use std::marker::PhantomData;
+/// Re-export Yansi Paint so painter can be disabled: `Paint::disable();`
+pub use yansi::Paint;
 
 /// The log collector and handler for most printed messages in terminal.
 #[derive(Debug)]
@@ -107,13 +109,13 @@ where
                     println!(
                         "{:<5}:{} - {}{}",
                         match level {
-                            Level::Error => "ERROR",
-                            Level::Warn => "WARN",
-                            Level::Info => "INFO",
-                            Level::Debug => "DEBUG",
-                            Level::Trace => "TRACE",
+                            Level::Error => Paint::red("ERROR"),
+                            Level::Warn => Paint::yellow("WARN"),
+                            Level::Info => Paint::blue("INFO"),
+                            Level::Debug => Paint::green("DEBUG"),
+                            Level::Trace => Paint::magenta("TRACE"),
                         },
-                        record.target(),
+                        Paint::new(record.target()).dimmed(),
                         record.args(),
                         match level {
                             Level::Error | Level::Warn =>
