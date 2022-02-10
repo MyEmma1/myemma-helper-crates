@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ApiErrorKind {
     /// An internal error
@@ -21,6 +23,24 @@ pub enum ApiErrorKind {
 impl Default for ApiErrorKind {
     fn default() -> Self {
         ApiErrorKind::PrivateError
+    }
+}
+
+impl Display for ApiErrorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use ApiErrorKind::*;
+        write!(
+            f,
+            "{}",
+            match self {
+                BadRequest => "Bad Request",
+                Unauthorized => "Unauthorized",
+                Forbidden => "Forbidden",
+                NotFound => "Not Found",
+                UnprocessableEntity => "Unprocessable Entity",
+                PrivateError | ServerError => "Server Error",
+            }
+        )
     }
 }
 
