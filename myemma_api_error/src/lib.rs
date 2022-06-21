@@ -92,6 +92,12 @@ where
     }
 
     pub fn set_kind(&mut self, kind: ApiErrorKind) {
+        log::info!(
+            "Changed internal error ({}): kind: `{:?}`->`{:?}`",
+            self.unique_id,
+            self.kind,
+            kind,
+        );
         self.kind = kind;
     }
 
@@ -147,7 +153,7 @@ where
         }
     }
 
-    /// Change internal error, but keep unique id.
+    /// Change internal error, but keep unique id from `self`.
     #[must_use]
     pub fn transform_to(self, mut other: Self) -> Self {
         // Check what parts of the error have changed.
