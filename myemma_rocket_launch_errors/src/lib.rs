@@ -10,10 +10,6 @@ pub fn handle_launch_errors(error: rocket::Error) {
             log::error!("{}", err);
             panic!("API IO error during launch.");
         }
-        ErrorKind::Runtime(ref err) => {
-            log::error!("{}", err);
-            panic!("API IO error during runtime.");
-        }
         ErrorKind::Config(err) => {
             log::error!("{}", err);
             panic!("Config is not valid.");
@@ -69,6 +65,10 @@ pub fn handle_launch_errors(error: rocket::Error) {
         ErrorKind::InsecureSecretKey(err) => {
             log::error!("{}", err);
             panic!("The configuration profile is not debug but not secret key is configured.");
+        }
+        ErrorKind::Shutdown(_, err) => {
+            log::error!("{:?}", err);
+            panic!("API Error during shutdown.");
         }
         err => {
             log::error!("{}", err);
