@@ -33,15 +33,13 @@ pub trait BacktraceFilter {
                     }
                     frame_info = name;
                 }
-                // if let Some(filename) = symbol.filename() {
-                //     frame_info = format!("{} ({})", frame_info, filename.display());
-                // }
+
                 // In debug mode add line numbers
-                if cfg!(debug_assertions) {
-                    if let Some(line) = symbol.lineno() {
-                        frame_info = format!("{} line: {}", frame_info, line);
-                    }
+                #[cfg(debug_assertions)]
+                if let Some(line) = symbol.lineno() {
+                    frame_info = format!("{} line: {}", frame_info, line);
                 }
+                
                 // Only add if not empty
                 if !frame_info.is_empty() {
                     bt_info.push(frame_info);
