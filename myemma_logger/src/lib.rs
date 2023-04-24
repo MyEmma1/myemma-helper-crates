@@ -2,12 +2,18 @@
 #![deny(clippy::all)]
 
 use chrono::Utc;
-use google_cloud_logging::*;
+use google_cloud_logging::{GoogleCloudStructLog, GCLogSeverity, GCOperation, GCSourceLocation};
 use log::{Level, Metadata, Record};
 use myemma_backtrace::BacktraceFilter;
 use std::marker::PhantomData;
 /// Re-export Yansi Paint so painter can be disabled: `Paint::disable();`
 pub use yansi::Paint;
+
+mod log_format;
+pub use log_format::LogFormat;
+
+mod log_filter;
+pub use log_filter::LogFilter;
 
 /// The log collector and handler for most printed messages in terminal.
 #[derive(Debug)]
@@ -20,28 +26,6 @@ where
     backtrace_count: u16,
     log_filter: L,
     _backtrace_filter: PhantomData<B>,
-}
-
-#[derive(Debug)]
-pub enum LogFormat {
-    Text,
-    Json,
-}
-
-impl LogFormat {
-    pub fn get_format() -> Self {
-        let log_format = std::env::var("LOG_FORMAT").unwrap_or_else(|_| "text".to_owned());
-        match log_format.as_ref() {
-            "json" => LogFormat::Json,
-            _ => LogFormat::Text,
-        }
-    }
-}
-
-impl Default for LogFormat {
-    fn default() -> Self {
-        Self::Text
-    }
 }
 
 impl<B, L> Default for Logger<B, L>
@@ -78,12 +62,6 @@ where
     }
 }
 
-pub trait LogFilter {
-    /// Filter out all log message that you do or don't want logged.
-    /// Only the items that return `true` will be kept.
-    fn filter(&self, metadata: &Metadata) -> bool;
-}
-
 impl<B, L> log::Log for Logger<B, L>
 where
     B: BacktraceFilter + Sized + Send + Sync,
@@ -95,15 +73,7 @@ where
 
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
-            let mut level = record.level();
-            // Convert Rocket launch warnings to info
-            // https://github.com/SergioBenitez/Rocket/issues/1828
-            if level == Level::Warn
-                && (record.target().eq("rocket::launch_") || record.target().eq("rocket::launch"))
-            {
-                level = Level::Info;
-            }
-
+            let level = record.level();
             match self.format {
                 LogFormat::Text => {
                     println!(

@@ -1,7 +1,7 @@
 [package]
 name = "myemma_rocket_launch_errors"
 version = "0.1.0"
-authors = ["Ralph Bisschops <ralph.bisschops.dev@gmail.com>"]
+authors = ["Team Ferris <team_ferris@snelstart.nl>"]
 license = "MIT OR Apache-2.0"
 homepage = "https://myemma.io/"
 edition = "2021"
@@ -10,5 +10,5 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = { version = "0.5.0-rc.1" }
-log = "0.4.14"
+rocket = { version = "0.5.0-rc.3" }
+log = "0.4.17"
