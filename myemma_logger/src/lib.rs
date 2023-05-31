@@ -22,6 +22,8 @@ where
     B: BacktraceFilter + Sized + Send + Sync,
     L: LogFilter + Sized + Send + Sync + Default,
 {
+    id: String,
+    producer: String,
     format: LogFormat,
     backtrace_count: u16,
     log_filter: L,
@@ -34,7 +36,7 @@ where
     L: LogFilter + Sized + Send + Sync + Default,
 {
     fn default() -> Self {
-        Self::new()
+        Self::new("MyEmma Backend", "MyEmma Backend Core")
     }
 }
 
@@ -43,8 +45,10 @@ where
     B: BacktraceFilter + Sized + Send + Sync,
     L: LogFilter + Sized + Send + Sync + Default,
 {
-    pub fn new() -> Self {
+    pub fn new(id: &str, producer: &str) -> Self {
         Self {
+            id: id.to_string(),
+            producer: producer.to_string(),
             format: LogFormat::get_format(),
             backtrace_count: 4,
             log_filter: L::default(),
@@ -52,13 +56,19 @@ where
         }
     }
 
-    pub fn new_with_count(backtrace_count: u16) -> Self {
-        Self {
-            format: LogFormat::get_format(),
-            backtrace_count,
-            log_filter: L::default(),
-            _backtrace_filter: PhantomData,
-        }
+    pub fn with_format(mut self, format: LogFormat) -> Self {
+        self.format = format;
+        self
+    }
+
+    pub fn with_backtrace_count(mut self, backtrace_count: u16) -> Self {
+        self.backtrace_count = backtrace_count;
+        self
+    }
+
+    pub fn with_log_filter(mut self, log_filter: L) -> Self {
+        self.log_filter = log_filter;
+        self
     }
 }
 
@@ -119,14 +129,14 @@ where
                             )
                         ),
                         operation: Some(GCOperation {
-                            id: Some("MyEmma Backend"),
-                            producer: Some("MyEmma Backend Core"),
+                            id: Some(&self.id),
+                            producer: Some(&self.producer),
                             ..Default::default()
                         }),
                         source_location: Some(GCSourceLocation {
-                            file: record.file_static(),
-                            line: record.line().map(|s| s.to_string()),
-                            function: record.module_path_static(),
+                            file: record.file(),
+                            line: record.line().map(|lineno| lineno.to_string()),
+                            function: record.module_path(),
                         }),
                         time: Some(Utc::now()),
                         ..Default::default()
