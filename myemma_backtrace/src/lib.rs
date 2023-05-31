@@ -39,7 +39,7 @@ pub trait BacktraceFilter {
                 if let Some(line) = symbol.lineno() {
                     frame_info = format!("{} line: {}", frame_info, line);
                 }
-                
+
                 // Only add if not empty
                 if !frame_info.is_empty() {
                     bt_info.push(frame_info);

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Default)]
 pub enum ApiErrorKind {
     /// An internal error
     /// HTTP Status code: 500
@@ -17,13 +17,8 @@ pub enum ApiErrorKind {
     UnprocessableEntity,
     /// Error message that never leaves server.
     /// HTTP Status code: 500
+    #[default]
     PrivateError,
-}
-
-impl Default for ApiErrorKind {
-    fn default() -> Self {
-        ApiErrorKind::PrivateError
-    }
 }
 
 impl Display for ApiErrorKind {
