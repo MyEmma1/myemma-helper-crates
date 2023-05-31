@@ -2,7 +2,7 @@
 #![deny(clippy::all)]
 
 use chrono::Utc;
-use google_cloud_logging::{GoogleCloudStructLog, GCLogSeverity, GCOperation, GCSourceLocation};
+use google_cloud_logging::{GCLogSeverity, GCOperation, GCSourceLocation, GoogleCloudStructLog};
 use log::{Level, Metadata, Record};
 use myemma_backtrace::BacktraceFilter;
 use std::marker::PhantomData;
