@@ -1,3 +1,5 @@
+use backtrace::Backtrace;
+
 use crate::{ApiError, ApiErrorKind};
 use std::fmt::Debug;
 
@@ -51,6 +53,11 @@ where
     #[must_use]
     fn get_kind(&self) -> ApiErrorKind {
         self.as_ref().get_kind()
+    }
+
+    #[must_use]
+    fn get_backtrace(&self) -> Backtrace {
+        self.as_ref().get_backtrace()
     }
 
     fn set_kind(&mut self, kind: ApiErrorKind) {

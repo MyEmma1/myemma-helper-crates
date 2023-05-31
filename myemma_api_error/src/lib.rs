@@ -9,10 +9,11 @@ pub use error_kind::ApiErrorKind;
 pub use error_manipulation::ApiErrorManipulation;
 use std::default::Default;
 use std::fmt::Debug;
+use backtrace::Backtrace;
 
 /// Represents all errors that may occur in the application (server).
 /// These errors will not be returned to the user, but they can be converted.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 pub struct ApiError<C> {
     /// Contains the error message
@@ -23,6 +24,14 @@ pub struct ApiError<C> {
     code: C,
     /// Unique error id
     unique_id: String,
+    /// Backtrace
+    backtrace: Backtrace
+}
+
+impl<C: PartialEq> PartialEq for ApiError<C> {
+    fn eq(&self, other: &Self) -> bool {
+        self.msg == other.msg && self.kind == other.kind && self.code == other.code && self.unique_id == other.unique_id
+    }
 }
 
 impl<C> ApiError<C>
@@ -37,6 +46,7 @@ where
             kind,
             code,
             unique_id: "".to_owned(),
+            backtrace: Backtrace::new_unresolved()
         };
         Self::create_new_issue_id(&mut new_internal_error);
         new_internal_error
@@ -70,6 +80,13 @@ where
             ApiErrorKind::ServerError,
             C::default(),
         )
+    }
+
+    #[must_use]
+    pub fn get_backtrace(&self) -> Backtrace {
+        let mut backtrace = self.backtrace.clone();
+        backtrace.resolve();
+        backtrace
     }
 
     #[must_use]
@@ -271,6 +288,7 @@ mod tests {
                 kind: ApiErrorKind::PrivateError,
                 code: ApiErrorCodes::Default,
                 unique_id: error.get_unique_id(),
+                backtrace: Backtrace::new_unresolved()
             },
             error
         );
