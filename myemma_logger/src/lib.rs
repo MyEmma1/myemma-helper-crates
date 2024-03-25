@@ -95,7 +95,7 @@ where
                             Level::Debug => Paint::green("DEBUG"),
                             Level::Trace => Paint::magenta("TRACE"),
                         },
-                        Paint::new(record.target()).dimmed(),
+                        Paint::new(record.target()).dim(),
                         record.args(),
                         match level {
                             Level::Error | Level::Warn =>
