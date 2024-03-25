@@ -1,10 +1,10 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all)]
 
-pub extern crate serde_json;
 pub extern crate chrono;
 pub extern crate google_cloud_logging;
 pub extern crate myemma_logger;
+pub extern crate serde_json;
 
 /// Provide custom error with links for when application panics (unrecoverable error).
 #[macro_export]
