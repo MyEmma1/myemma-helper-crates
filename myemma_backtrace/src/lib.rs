@@ -44,10 +44,12 @@ pub trait BacktraceFilter {
                             .map(|colno| format!(":{}", colno))
                             .unwrap_or(String::new())
                     ));
-                    amount -= 1;
+                    if amount > 0 {
+                        amount -= 1;
+                    }
                 }
             });
-            amount != 0 // keep going to the next frame until we have the amount we want
+            amount > 0 // keep going to the next frame until we have the amount we want
         });
 
         if !bt_info.is_empty() {
