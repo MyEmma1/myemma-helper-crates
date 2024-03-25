@@ -8,7 +8,6 @@ mod from_std;
 use backtrace::Backtrace;
 pub use error_kind::ApiErrorKind;
 pub use error_manipulation::ApiErrorManipulation;
-use std::default::Default;
 use std::fmt::Debug;
 
 /// Represents all errors that may occur in the application (server).

@@ -1,5 +1,4 @@
 use super::{ApiError, ApiErrorKind};
-use std::default::Default;
 use std::fmt::Debug;
 
 impl<C> From<std::num::ParseIntError> for ApiError<C>
