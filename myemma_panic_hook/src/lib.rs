@@ -1,6 +1,11 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all)]
 
+pub extern crate serde_json;
+pub extern crate chrono;
+pub extern crate google_cloud_logging;
+pub extern crate myemma_logger;
+
 /// Provide custom error with links for when application panics (unrecoverable error).
 #[macro_export]
 macro_rules! setup_panic_hook {
@@ -8,16 +13,11 @@ macro_rules! setup_panic_hook {
         $operation_identifier:literal, $producer_identifier:literal,
         $backtrace_filter:ty, $backtrace_count:literal $(,)*
     ) => {
-        use std::panic::{self, PanicInfo};
-
         // This code is inspired by the `human-panic` crate.
         // Only use custom panic when `RUST_BACKTRACE` is not set.
         match ::std::env::var("RUST_BACKTRACE") {
             Err(_) => {
-                panic::set_hook(Box::new(move |info: &PanicInfo| {
-                    use google_cloud_logging::*;
-                    use chrono::{Utc};
-
+                std::panic::set_hook(Box::new(move |info: &std::panic::PanicInfo| {
                     let payload = info.payload();
                     let panic_message = if let Some(s) = payload.downcast_ref::<&str>() {
                         s.to_string()
@@ -42,8 +42,8 @@ macro_rules! setup_panic_hook {
                         // column = location.column();
                     }
 
-                    match myemma_logger::LogFormat::get_format() {
-                        myemma_logger::LogFormat::Text => {
+                    match $crate::myemma_logger::LogFormat::get_format() {
+                        $crate::myemma_logger::LogFormat::Text => {
                             println!(
                                 "PANIC:{} - {}:{}{}",
                                 panic_message,
@@ -52,9 +52,9 @@ macro_rules! setup_panic_hook {
                                 <$backtrace_filter>::get_backtrace_info($backtrace_count),
                             );
                         }
-                        myemma_logger::LogFormat::Json => {
-                            let log_entry = GoogleCloudStructLog {
-                                severity: Some(GCLogSeverity::Critical),
+                        $crate::myemma_logger::LogFormat::Json => {
+                            let log_entry = $crate::google_cloud_logging::GoogleCloudStructLog {
+                                severity: Some($crate::google_cloud_logging::GCLogSeverity::Critical),
                                 // More info see: https://cloud.google.com/error-reporting/docs/formatting-error-messages#@type
                                 report_type: Some(
                                     "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent"
@@ -63,22 +63,22 @@ macro_rules! setup_panic_hook {
                                 message: Some(
                                     format!("{}{}", panic_message, <$backtrace_filter>::get_backtrace_info($backtrace_count))
                                 ),
-                                operation: Some(GCOperation {
+                                operation: Some($crate::google_cloud_logging::GCOperation {
                                     id: Some($operation_identifier),
                                     producer: Some($producer_identifier),
                                     ..Default::default()
                                 }),
-                                source_location: Some(GCSourceLocation {
+                                source_location: Some($crate::google_cloud_logging::GCSourceLocation {
                                     file: Some(file),
                                     line: Some(line.to_string()),
                                     function: None,
                                 }),
-                                time: Some(Utc::now()),
+                                time: Some($crate::chrono::Utc::now()),
                                 ..Default::default()
                             };
                             println!(
                                 "{}",
-                                serde_json::to_string(&log_entry).expect("Error during logging panic")
+                                $crate::serde_json::to_string(&log_entry).expect("Error during logging panic")
                             );
                         }
                     }

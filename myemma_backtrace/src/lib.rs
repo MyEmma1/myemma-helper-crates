@@ -34,19 +34,17 @@ pub trait BacktraceFilter {
                         symbol
                             .filename()
                             .map(|filename| filename.display().to_string())
-                            .unwrap_or(String::new()),
+                            .unwrap_or_default(),
                         symbol
                             .lineno()
                             .map(|lineno| lineno.to_string())
-                            .unwrap_or(String::new()),
+                            .unwrap_or_default(),
                         symbol
                             .colno()
                             .map(|colno| format!(":{}", colno))
-                            .unwrap_or(String::new())
+                            .unwrap_or_default()
                     ));
-                    if amount > 0 {
-                        amount -= 1;
-                    }
+                    amount = amount.saturating_sub(1);
                 }
             });
             amount > 0 // keep going to the next frame until we have the amount we want
